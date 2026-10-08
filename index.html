@@ -20,7 +20,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23B3245E' d='M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z'/%3E%3C/svg%3E">
 <link rel="preload" href="assets/great-vibes.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/alegreya.woff2" as="font" type="font/woff2" crossorigin>
-<script>document.documentElement.classList.add('js')</script>
+<script>
+(function () {
+  var r = document.documentElement;
+  r.classList.add('js');
+  try { if (!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) r.classList.add('has-envelope'); } catch (e) {}
+  window.addEventListener('error', function () { r.classList.remove('js', 'has-envelope'); });
+})();
+</script>
 <style>
 @font-face { font-family: "Great Vibes"; src: url("assets/great-vibes.woff2") format("woff2"); font-display: block; }
 @font-face { font-family: "Alegreya"; src: url("assets/alegreya.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
@@ -30,7 +37,9 @@
   --blush-bottom: #FBE4EB;
   --ink: #3B1730;
   --rose: #B3245E;
+  --rose-deep: #8E1B4A;
   --petal: #F2BFCD;
+  --paper: #FFFBFC;
 }
 
 * { box-sizing: border-box; }
@@ -41,10 +50,12 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100svh;
+  overflow-x: hidden;
   color: var(--ink);
   background: linear-gradient(180deg, var(--blush-top) 0%, var(--blush-bottom) 100%);
   font-family: "Alegreya", "Iowan Old Style", Georgia, serif;
   font-weight: 430;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* faint paper grain */
@@ -59,17 +70,38 @@ body::before {
 
 ::selection { background: var(--petal); color: var(--ink); }
 
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.page { position: relative; z-index: 1; overflow-x: hidden; overflow-x: clip; }
+
+/* ---------- hero ---------- */
 .hero {
-  padding: max(40px, env(safe-area-inset-top)) 24px 0;
+  position: relative;
+  padding: max(36px, env(safe-area-inset-top)) 24px 4px;
   text-align: center;
 }
 
+.hero::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 380px;
+  height: 380px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
 .hands {
+  position: relative;
   display: block;
   width: min(36vw, 168px);
   height: auto;
   margin: 0 auto;
 }
+
+.name-wrap { position: relative; display: inline-block; }
 
 .name {
   margin: -.06em 0 0;
@@ -81,92 +113,468 @@ body::before {
   color: var(--rose);
 }
 
+.sparkle { position: absolute; width: 14px; height: 14px; fill: #E9A3B8; opacity: 0; pointer-events: none; }
+.s1 { left: 3%; top: 20%; width: 12px; height: 12px; --tw: 2.4s; }
+.s2 { right: 5%; top: 4%; width: 17px; height: 17px; fill: #F2B4C6; --tw: 3.3s; }
+.s3 { right: -1%; bottom: 32%; width: 10px; height: 10px; --tw: 4.1s; }
+.s4 { left: 20%; bottom: 3%; width: 11px; height: 11px; fill: #F2B4C6; --tw: 5s; }
+
+/* ---------- the letter on stationery ---------- */
+.paper {
+  position: relative;
+  max-width: 36rem;
+  margin: 10px 14px 0;
+  padding: 46px 24px 34px;
+  background: var(--paper);
+  border-radius: 8px;
+  box-shadow: 0 34px 60px -34px rgba(142, 27, 74, .38), 0 2px 10px rgba(142, 27, 74, .06);
+}
+
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(179, 36, 94, .16);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.sprig { position: absolute; width: 80px; height: auto; pointer-events: none; }
+.sprig.tl { top: -22px; left: -6px; transform: rotate(-26deg); }
+.sprig.br { bottom: -18px; right: -6px; transform: rotate(154deg); }
+
 .letter {
-  max-width: 34rem;
-  margin: 0 auto;
-  padding: 18px 26px max(72px, env(safe-area-inset-bottom));
-  font-size: clamp(19px, 5vw, 21.5px);
+  position: relative;
+  font-size: clamp(19px, 5vw, 21px);
   line-height: 1.78;
 }
 
-.letter p {
-  margin: 0;
-  text-wrap: pretty;
-  overflow-wrap: break-word;
+.letter p { margin: 0; text-wrap: pretty; overflow-wrap: break-word; }
+.letter p + p { margin-top: .95em; }
+
+.letter p:first-child::first-letter {
+  float: left;
+  font-family: "Great Vibes", "Snell Roundhand", cursive;
+  font-weight: 400;
+  font-size: 3.4em;
+  line-height: .8;
+  color: var(--rose);
+  margin: .08em .08em 0 -.02em;
 }
 
-.letter p + p { margin-top: .95em; }
-.letter p.gap { margin-top: 1.75em; }
+.pause {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 1.2em 0;
+  color: var(--petal);
+}
+.pause::before, .pause::after { content: ""; width: 56px; height: 1px; background: currentColor; }
+.pause svg { width: 14px; height: 14px; fill: var(--rose); opacity: .7; }
+.letter .pause + p { margin-top: 0; }
 
 .letter p.closing {
-  margin-top: .9em;
+  margin-top: 1em;
   text-align: center;
   font-family: "Great Vibes", "Snell Roundhand", cursive;
-  font-size: clamp(36px, 11.6vw, 56px);
+  font-size: min(54px, calc((100vw - 84px) / 7.8));
   line-height: 1.3;
   white-space: nowrap;
   color: var(--rose);
 }
 
-.heart {
-  display: block;
-  width: 26px;
-  height: 26px;
-  margin: 4px auto 0;
-  fill: var(--rose);
+.seal-end { position: relative; width: 76px; height: 76px; margin: 12px auto 0; }
+.seal-end svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 5px 7px rgba(90, 15, 45, .3)); }
+.heart { fill: #6A1238; }
+.heart-hi { fill: #F9B8CB; fill-opacity: .42; }
+
+.burst i {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: var(--h, 14px);
+  height: var(--h, 14px);
+  margin-left: calc(var(--h, 14px) / -2);
+  opacity: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23D8517F' d='M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
-/* one orchestrated moment: her name is written, then the letter appears */
-.js .hands { opacity: 0; }
-.js .name { clip-path: inset(-25% 100% -25% -10%); }
-.js .letter { opacity: 0; }
+@media (min-width: 600px) {
+  .paper { margin: 14px auto 0; padding: 62px 58px 48px; }
+  .sprig { width: 100px; }
+  .sprig.tl { top: -30px; left: -14px; }
+  .sprig.br { bottom: -24px; right: -14px; }
+}
 
-.ready .hands { animation: fade 1s ease-out forwards; }
-.ready .name { animation: write 1.7s cubic-bezier(.45, .05, .35, 1) .3s forwards; }
-.ready .letter { animation: fade 1.1s ease-out 1.7s forwards; }
-.ready .heart { animation: beat 1.4s ease-in-out 3s 1; }
+.after { height: max(80px, env(safe-area-inset-bottom)); }
+
+/* ---------- envelope ---------- */
+.stage { display: none; }
+.has-envelope body { overflow: hidden; }
+
+.has-envelope .stage {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 24px;
+  background: radial-gradient(120% 85% at 50% 38%, #FFF9FB 0%, #FBE6ED 62%, #F6D3DE 100%);
+}
+
+.envelope {
+  position: relative;
+  width: min(82vw, 340px);
+  height: calc(min(82vw, 340px) / 1.5);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1100px;
+  -webkit-appearance: none;
+  appearance: none;
+  animation: float 5s ease-in-out infinite;
+}
+.envelope:focus-visible { outline: 2px solid var(--rose); outline-offset: 10px; border-radius: 14px; }
+
+.env-back, .env-paper, .env-front, .env-flap, .env-seal { position: absolute; display: block; }
+
+.env-back {
+  inset: 0;
+  z-index: 1;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #F6CFDB, #EDBACA);
+  box-shadow: 0 30px 50px -22px rgba(142, 27, 74, .42);
+}
+
+.env-paper {
+  left: 7%;
+  right: 7%;
+  top: 7%;
+  bottom: 9%;
+  z-index: 3;
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 13px, rgba(179, 36, 94, .12) 13px 14px) 50% 30% / 74% 46% no-repeat,
+    var(--paper);
+  box-shadow: 0 2px 6px rgba(142, 27, 74, .08);
+  transition: transform 1.1s cubic-bezier(.2, .7, .2, 1);
+}
+
+.env-front {
+  inset: 0;
+  z-index: 4;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #FCE6EC 0%, #F3C7D4 100%);
+  clip-path: polygon(0 0, 50% 51%, 100% 0, 100% 100%, 0 100%);
+}
+
+.env-to {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6%;
+  text-align: center;
+  font-family: "Great Vibes", "Snell Roundhand", cursive;
+  font-size: calc(min(82vw, 340px) * .13);
+  line-height: 1;
+  color: var(--rose-deep);
+}
+
+.env-flap {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 53%;
+  z-index: 5;
+  transform-origin: 50% 0;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #F0BFCE 0%, #E7A9BC 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.env-seal {
+  left: 50%;
+  top: 52%;
+  width: 21%;
+  height: 31.5%;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 4px 6px rgba(90, 15, 45, .35));
+  animation: pulse 2.6s ease-in-out infinite;
+}
+.env-seal svg { display: block; width: 100%; height: 100%; }
+.seal-d, .seal-hi { font-family: "Great Vibes", "Snell Roundhand", cursive; font-size: 56px; }
+.seal-d { fill: #6A1238; }
+.seal-hi { fill: #F9B8CB; fill-opacity: .45; }
+
+.hint {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: .03em;
+  color: rgba(59, 23, 48, .62);
+  animation: breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes float { 50% { transform: translateY(-6px); } }
+@keyframes pulse { 50% { transform: translate(-50%, -50%) scale(1.06); } }
+@keyframes breathe { 50% { opacity: .45; } }
+
+.opening .envelope { animation: none; cursor: default; }
+.opening .env-seal { animation: seal-off .55s ease-in forwards; }
+.opening .env-flap { animation: flap 1.05s cubic-bezier(.45, 0, .25, 1) .3s forwards; }
+.opening .env-paper { transform: translateY(-44%); transition-delay: 1.1s; }
+.opening .hint { animation: none; opacity: 0; transition: opacity .4s; }
+.leaving .stage { animation: stage-out 1s ease forwards; }
+
+@keyframes seal-off {
+  35% { transform: translate(-50%, -50%) scale(1.14); }
+  100% { transform: translate(-50%, -50%) scale(.5); opacity: 0; }
+}
+@keyframes flap {
+  0% { transform: rotateX(0deg); z-index: 5; }
+  49% { z-index: 5; }
+  50% { z-index: 2; }
+  100% { transform: rotateX(178deg); z-index: 2; }
+}
+@keyframes stage-out { to { opacity: 0; transform: scale(1.05); visibility: hidden; } }
+
+/* ---------- petals ---------- */
+.petals { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.petals.front { z-index: 25; }
+.petal {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  opacity: 0;
+  will-change: transform;
+  animation: fall var(--d) linear var(--delay) infinite;
+}
+.petal svg { display: block; width: 100%; height: 100%; opacity: var(--o); animation: sway var(--sw) ease-in-out infinite alternate; }
+@keyframes fall {
+  0% { transform: translate3d(0, -8vh, 0); opacity: 0; }
+  10% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translate3d(0, 108vh, 0); opacity: 0; }
+}
+@keyframes sway {
+  from { transform: translateX(-16px) rotate(var(--r0)); }
+  to { transform: translateX(16px) rotate(var(--r1)); }
+}
+
+/* ---------- the slow reveal ---------- */
+.js .hands, .js .paper { opacity: 0; }
+.js .name { clip-path: inset(-25% 100% -25% -10%); }
+.js .letter p, .js .pause { opacity: 0; filter: blur(3px); transition: opacity 1.3s ease, filter 1.3s ease; }
+.js .letter .seen { opacity: 1; filter: none; }
+.closing span { display: inline-block; }
+.js .closing span { clip-path: inset(-30% 100% -30% -10%); }
+.js .seal-end svg { opacity: 0; }
+
+.ready .hands { animation: fade 1.2s ease-out forwards; }
+.ready .name { animation: write 1.9s cubic-bezier(.45, .05, .35, 1) .35s forwards; }
+.ready .paper { animation: rise 1.3s cubic-bezier(.2, .7, .2, 1) 1.6s forwards; }
+.ready .sparkle { animation: twinkle 4.2s ease-in-out var(--tw) infinite; }
+
+.finale .closing span { animation: write 2s cubic-bezier(.45, .05, .35, 1) .2s forwards; }
+.finale .seal-end svg { animation: seal-in 1s cubic-bezier(.3, 1.5, .5, 1) 1.9s both; }
+.finale .burst i { animation: rise-heart 2.8s ease-out calc(2.4s + var(--d)) forwards; }
 
 @keyframes fade { to { opacity: 1; } }
-@keyframes write { to { clip-path: inset(-25% -10% -25% -10%); } }
-@keyframes beat {
-  0%, 100% { transform: scale(1); }
-  30% { transform: scale(1.18); }
-  55% { transform: scale(.96); }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes write { to { clip-path: inset(-30% -10% -30% -10%); } }
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); }
+  50% { opacity: .95; transform: scale(1) rotate(40deg); }
+}
+@keyframes seal-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes rise-heart {
+  0% { opacity: 0; transform: translate(0, 0) scale(.5); }
+  15% { opacity: .9; }
+  100% { opacity: 0; transform: translate(var(--x), -150px) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js .hands, .js .letter { opacity: 1; }
-  .js .name { clip-path: none; }
-  .ready .hands, .ready .name, .ready .letter, .ready .heart { animation: none; }
-}
-
-@media (min-width: 720px) {
-  .hero { padding-top: 64px; }
-  .letter { padding-bottom: 110px; }
+  .js .hands, .js .paper, .js .letter p, .js .pause, .js .seal-end svg { opacity: 1 !important; filter: none !important; animation: none !important; }
+  .js .name, .js .closing span { clip-path: none !important; animation: none !important; }
+  .sparkle, .petals, .burst { display: none !important; }
 }
 </style>
 </head>
 <body>
-<header class="hero">
-  <img class="hands" src="assets/hands.png" width="413" height="660" alt="">
-  <h1 class="name">Deeqa</h1>
-</header>
-<main class="letter">
-  <p>Gacalisadayda, Macaanto, Deeqa, qalbi uroon...Amaantu igamay dhamaato adna kama dharagtid....</p>
-  <p>Waxaad tahay sida dhibic roob oo curatay xilli ay naftu u baahnayd. Quruxdaada maka muuqato oo kaliya jirkaaga, ee waa iftiin ka dhex muuqda hab-dhaqankaaga, asluubtaada, iyo gobonnimada aad leedahay....Waxaad tahay hooyga xasilloonida qalbigayga</p>
-  <p>Daacadnimadaada, Kaalin galkaaga, naxariistaada, iyo dhoola-caddayntaada ayaa ah hantida ugu dhow ee qalbigaygu leeyahay</p>
-  <p class="gap">Jacaylka aan ku qabo ma laha xad iyo xuduud qiyaasta..... Waxaad tahay hadiyadda ugu quruxda badan oo noloshayda soo gashay.</p>
-  <p class="closing">Waan ku jecelahay!</p>
-  <svg class="heart" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z"/></svg>
-</main>
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="wax" cx="36%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#E25C8A"/>
+      <stop offset=".5" stop-color="#B3245E"/>
+      <stop offset="1" stop-color="#76153F"/>
+    </radialGradient>
+    <linearGradient id="petal-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FCD6E1"/>
+      <stop offset="1" stop-color="#EE9DB6"/>
+    </linearGradient>
+    <symbol id="seal" viewBox="0 0 100 100">
+      <path d="M93.9 45.6Q96.4 50.0 95.5 54.7Q94.6 59.5 92.4 63.7Q90.2 67.9 87.3 71.5Q84.5 75.1 81.5 78.3Q78.4 81.6 74.5 83.6Q70.6 85.7 67.2 89.0Q63.7 92.3 59.4 94.9Q55.0 97.6 50.2 95.2Q45.5 92.9 41.3 91.2Q37.1 89.6 33.0 88.0Q28.9 86.5 25.4 83.8Q21.9 81.2 18.2 78.5Q14.6 75.7 10.3 72.6Q6.1 69.5 6.0 64.5Q5.9 59.4 7.7 54.7Q9.4 50.0 9.2 45.6Q9.0 41.3 8.8 36.4Q8.6 31.6 11.2 27.7Q13.9 23.8 16.8 20.0Q19.7 16.3 22.9 12.6Q26.2 8.8 31.7 9.6Q37.2 10.5 41.4 9.8Q45.7 9.2 50.1 8.0Q54.5 6.8 59.3 6.8Q64.0 6.8 68.0 9.3Q72.1 11.8 76.0 14.3Q79.9 16.8 83.0 20.2Q86.2 23.7 86.4 28.7Q86.5 33.7 89.0 37.5Q91.4 41.2 93.9 45.6Z" fill="url(#wax)"/>
+      <circle cx="50" cy="50" r="31" fill="none" stroke="#6A1238" stroke-opacity=".5" stroke-width="2.4"/>
+      <circle cx="49.2" cy="49.2" r="31" fill="none" stroke="#F7B3C8" stroke-opacity=".35" stroke-width="1.1"/>
+    </symbol>
+    <symbol id="petal" viewBox="0 0 40 40">
+      <path fill="url(#petal-fill)" d="M20 2C29.5 6 37 15.5 33 26.5 30 34.5 24 38 20 38S9.5 34 7 26C3.5 15 10.5 6 20 2z"/>
+      <path fill="none" stroke="#E58AA6" stroke-opacity=".35" stroke-width=".8" d="M20 6c-2 9-2 19 0 29"/>
+    </symbol>
+    <symbol id="sparkle" viewBox="0 0 20 20">
+      <path d="M10 0C11 7 13 9 20 10 13 11 11 13 10 20 9 13 7 11 0 10 7 9 9 7 10 0z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage" id="stage">
+  <button class="envelope" id="envelope" type="button" aria-label="Open the letter">
+    <span class="env-back"></span>
+    <span class="env-paper"></span>
+    <span class="env-front"><span class="env-to">For Deeqa</span></span>
+    <span class="env-flap"></span>
+    <span class="env-seal"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#seal"/><text class="seal-hi" x="49.1" y="66.2" text-anchor="middle">D</text><text class="seal-d" x="50" y="67" text-anchor="middle">D</text></svg></span>
+  </button>
+  <p class="hint">Tap to open</p>
+</div>
+
+<div class="petals" id="petals" aria-hidden="true"></div>
+
+<div class="page">
+  <header class="hero">
+    <img class="hands" src="assets/hands.png" width="413" height="660" alt="">
+    <div class="name-wrap">
+      <h1 class="name">Deeqa</h1>
+      <svg class="sparkle s1" aria-hidden="true"><use href="#sparkle"/></svg>
+      <svg class="sparkle s2" aria-hidden="true"><use href="#sparkle"/></svg>
+      <svg class="sparkle s3" aria-hidden="true"><use href="#sparkle"/></svg>
+      <svg class="sparkle s4" aria-hidden="true"><use href="#sparkle"/></svg>
+    </div>
+  </header>
+
+  <main class="paper">
+    <img class="sprig tl" src="assets/sprig.png" width="180" height="108" alt="">
+    <img class="sprig br" src="assets/sprig.png" width="180" height="108" alt="">
+    <div class="letter">
+      <p>Gacalisadayda, Macaanto, Deeqa, qalbi uroon...Amaantu igamay dhamaato adna kama dharagtid....</p>
+      <p>Waxaad tahay sida dhibic roob oo curatay xilli ay naftu u baahnayd. Quruxdaada maka muuqato oo kaliya jirkaaga, ee waa iftiin ka dhex muuqda hab-dhaqankaaga, asluubtaada, iyo gobonnimada aad leedahay....Waxaad tahay hooyga xasilloonida qalbigayga</p>
+      <p>Daacadnimadaada, Kaalin galkaaga, naxariistaada, iyo dhoola-caddayntaada ayaa ah hantida ugu dhow ee qalbigaygu leeyahay</p>
+      <div class="pause" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z"/></svg></div>
+      <p class="gap">Jacaylka aan ku qabo ma laha xad iyo xuduud qiyaasta..... Waxaad tahay hadiyadda ugu quruxda badan oo noloshayda soo gashay.</p>
+      <p class="closing"><span>Waan ku jecelahay!</span></p>
+    </div>
+    <div class="seal-end" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><use href="#seal"/><path class="heart-hi" transform="translate(33.2 32.2)" d="M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z"/><path class="heart" transform="translate(34 33)" d="M16 29s-12-7.4-12-16A6.6 6.6 0 0 1 16 8.4 6.6 6.6 0 0 1 28 13c0 8.6-12 16-12 16z"/></svg>
+      <span class="burst">
+        <i style="--x:-46px;--d:0s;--h:12px"></i><i style="--x:-22px;--d:.25s;--h:16px"></i><i style="--x:4px;--d:.1s;--h:13px"></i>
+        <i style="--x:28px;--d:.4s;--h:15px"></i><i style="--x:50px;--d:.2s;--h:11px"></i><i style="--x:-34px;--d:.6s;--h:10px"></i>
+        <i style="--x:16px;--d:.75s;--h:12px"></i><i style="--x:40px;--d:.9s;--h:9px"></i><i style="--x:-10px;--d:1s;--h:14px"></i>
+      </span>
+    </div>
+  </main>
+  <div class="after"></div>
+</div>
+
 <script>
 (function () {
-  var root = document.documentElement, done = false;
-  function go() { if (!done) { done = true; root.classList.add('ready'); } }
-  setTimeout(go, 2500);
-  if (document.fonts && document.fonts.load) {
-    Promise.all([document.fonts.load('1em "Great Vibes"'), document.fonts.load('1em "Alegreya"')]).then(go, go);
-  } else { go(); }
+  var root = document.documentElement;
+  try {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var stage = document.getElementById('stage');
+    var env = document.getElementById('envelope');
+    var paper = document.querySelector('.paper');
+    var petalBox = document.getElementById('petals');
+    var started = false, petalsOn = false;
+
+    function fontsReady() {
+      var timeout = new Promise(function (r) { setTimeout(r, 2500); });
+      if (!(document.fonts && document.fonts.load)) return timeout;
+      return Promise.race([
+        Promise.all([document.fonts.load('1em "Great Vibes"'), document.fonts.load('1em "Alegreya"')]),
+        timeout
+      ]);
+    }
+
+    function startPetals() {
+      if (petalsOn || reduce) return;
+      petalsOn = true;
+      var count = window.innerWidth > 700 ? 18 : 12;
+      for (var i = 0; i < count; i++) {
+        var p = document.createElement('span');
+        p.className = 'petal';
+        var s = p.style;
+        s.setProperty('--x', (Math.random() * 96).toFixed(1) + 'vw');
+        s.setProperty('--s', (12 + Math.random() * 12).toFixed(0) + 'px');
+        s.setProperty('--d', (11 + Math.random() * 9).toFixed(1) + 's');
+        s.setProperty('--delay', (i * 0.9 + Math.random() * 1.2).toFixed(1) + 's');
+        s.setProperty('--sw', (2.4 + Math.random() * 2).toFixed(1) + 's');
+        s.setProperty('--o', (0.55 + Math.random() * 0.35).toFixed(2));
+        s.setProperty('--r0', (-40 + Math.random() * 30).toFixed(0) + 'deg');
+        s.setProperty('--r1', (20 + Math.random() * 60).toFixed(0) + 'deg');
+        p.innerHTML = '<svg viewBox="0 0 40 40"><use href="#petal"/></svg>';
+        petalBox.appendChild(p);
+      }
+    }
+
+    function reveal() {
+      var items = [].slice.call(document.querySelectorAll('.letter p, .pause'));
+      var closing = document.querySelector('.closing');
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('seen'); });
+        paper.classList.add('finale');
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        var k = 0;
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var el = e.target;
+          el.style.transitionDelay = (k++ * 0.28).toFixed(2) + 's';
+          el.classList.add('seen');
+          io.unobserve(el);
+          if (el === closing) paper.classList.add('finale');
+        });
+      }, { threshold: 0.15 });
+      items.forEach(function (el) { io.observe(el); });
+    }
+
+    function startPage() {
+      if (started) return;
+      started = true;
+      root.classList.add('ready');
+      setTimeout(reveal, 1700);
+      startPetals();
+    }
+
+    function openEnvelope() {
+      if (root.classList.contains('opening')) return;
+      root.classList.add('opening');
+      petalBox.classList.add('front');
+      startPetals();
+      setTimeout(function () { root.classList.add('leaving'); }, 2100);
+      setTimeout(startPage, 2300);
+      setTimeout(function () {
+        root.classList.remove('has-envelope', 'opening', 'leaving');
+        if (stage && stage.parentNode) stage.parentNode.removeChild(stage);
+        petalBox.classList.remove('front');
+      }, 3200);
+    }
+
+    if (root.classList.contains('has-envelope') && env) {
+      env.addEventListener('click', openEnvelope);
+    } else {
+      fontsReady().then(startPage, startPage);
+    }
+  } catch (err) {
+    root.classList.remove('js', 'has-envelope');
+  }
 })();
 </script>
 </body>
